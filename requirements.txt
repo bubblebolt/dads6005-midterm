@@ -3,3 +3,8 @@ streamlit
 plotly
 pandas
 pinotdb
+streamlit_autorefresh
+plotly
+PIL
+requests
+io

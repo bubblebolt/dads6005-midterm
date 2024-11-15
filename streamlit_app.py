@@ -4,7 +4,9 @@ from streamlit_autorefresh import st_autorefresh
 import plotly.express as px
 import pandas as pd
 from pinotdb import connect
-
+from PIL import Image
+import requests
+from io import BytesIO
 
 # Set Streamlit page configuration for wide layout
 st.set_page_config(layout="wide")
@@ -238,4 +240,36 @@ with col2:
     st.subheader("Average Purchase Amount by State")
     st.plotly_chart(fig1, use_container_width=True, height=900)  # Plot the choropleth map
 
+col1, col2, col3, col4 = st.columns(4)
 
+# ฟังก์ชันโหลดภาพจาก URL
+def load_image(url):
+    response = requests.get(url)
+    img = Image.open(BytesIO(response.content))
+    return img
+
+# ฟังก์ชันครอปภาพ
+def crop_image(image, size=(500, 500)):
+    width, height = image.size
+    left = (width - size[0]) / 2
+    top = (height - size[1]) / 2
+    right = (width + size[0]) / 2
+    bottom = (height + size[1]) / 2
+    cropped_image = image.crop((left, top, right, bottom))
+    return cropped_image
+
+
+# URL ของภาพ
+urls = [
+    "https://i1.adis.ws/i/canon/eos-r7-lifestyle_c604337a3b374a94a080d40b43f3a920?$70-30-header-4by3-dt-jpg$",
+    "https://s2-techtudo.glbimg.com/Aa6RJdKVwf_yn4thohmm3M72tXY=/1200x/smart/filters:cover():strip_icc()/i.s3.glbimg.com/v1/AUTH_08fbf48bc0524877943fe86e43087e7a/internal_photos/bs/2022/S/R/vI6dnhQbmlMgKRx6TSIw/apple-watch-ultra-thassius-veloso-techtudo-02.jpg",
+    "https://d30wkz0ptv5pwh.cloudfront.net/media/magefan_blog/mobile_phone.jpg",
+    "https://media.cnn.com/api/v1/images/stellar/prod/microsoft-surface-laptop-2024-cnnu-01.jpg?c=16x9&q=h_833,w_1480,c_fill"
+]
+
+# โหลดและแสดงภาพในแต่ละคอลัมน์
+for i, col in enumerate([col1, col2, col3, col4]):
+    with col:
+        img = load_image(urls[i])
+        cropped_img = crop_image(img, size=(500, 500))  # ครอปภาพให้มีขนาด 500x500
+        st.image(cropped_img, width=500)
