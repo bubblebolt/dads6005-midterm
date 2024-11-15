@@ -1,10 +1,7 @@
-time
 streamlit
+streamlit-autorefresh
 plotly
 pandas
 pinotdb
-streamlit_autorefresh
-plotly
-PIL
+Pillow
 requests
-io
