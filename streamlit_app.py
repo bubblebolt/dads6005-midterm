@@ -3,11 +3,78 @@ import plotly.express as px
 import pandas as pd
 from pinotdb import connect
 
+# Set Streamlit page configuration for wide layout
+st.set_page_config(layout="wide")
+
+# Add custom CSS for header with wide layout
+st.markdown(
+    """
+    <style>
+    /* General body styling */
+    body {
+        background-color: #D8DBBD;  /* Body background color */
+    }
+
+    .main {
+        background-color: #D8DBBD;  /* Main content background */
+    }
+
+    .block-container {
+        background-color: #D8DBBD;  /* Content container background */
+    }
+
+    /* Custom header styling */
+    header[data-testid="stHeader"] {
+        background-color: #2A3663;  /* Header background color */
+        padding: 20px;  /* Add padding for better appearance */
+        display: flex;  /* Flex layout for alignment */
+        align-items: center;  /* Center align vertically */
+        justify-content: flex-start;  /* Align items to the left */
+        width: 100%;  /* Full width */
+        position: fixed;  /* Fixed position at the top */
+        top: 0;  /* Stick to the top */
+        left: 0;  /* Stick to the left */
+        z-index: 1000;  /* Ensure it appears above all other content */
+    }
+
+    /* Logo styling */
+    header img {
+        height: 50px;  /* Set logo height */
+        margin-right: 20px;  /* Add spacing between logo and title */
+    }
+
+    /* Title styling */
+    header h1 {
+        color: #FAF6E3;  /* Title color */
+        font-size: 24px;  /* Title font size */
+        margin: 0;  /* Remove margin */
+    }
+
+    /* Adjust content to avoid overlapping header */
+    .main {
+        padding-top: 100px;  /* Add space equal to header height */
+    }
+    </style>
+    """, 
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    """
+    <header data-testid="stHeader">
+        <img src="https://raw.githubusercontent.com/bubblebolt/dads/main/DADS5001/ASM4-Dash/Pics/BOBO%20SHOP.png" alt="Logo">  <!-- Use the raw file link -->
+        <h1>BoBo Shops Dashboard</h1>
+    </header>
+    """, 
+    unsafe_allow_html=True
+)
+
+
 # Establish the connection
 conn = connect(host='54.179.138.51', port=8099, path='/query/sql', schema='http')
 curs = conn.cursor()
 
-# Query to get the average price per state
+# Query for average purchase by state
 curs.execute('''SELECT 
     STATE,
     AVG(TOTAL_PRICE) AS avg_price_per_state
@@ -38,7 +105,7 @@ states_df['latitude'] = states_df['state'].map(lambda x: latitude_longitude_dict
 states_df['longitude'] = states_df['state'].map(lambda x: latitude_longitude_dict.get(x, {}).get('longitude'))
 
 # Create a choropleth map using the custom GeoJSON
-choropleth_fig = px.choropleth(
+fig1 = px.choropleth(
     states_df,
     geojson="https://raw.githubusercontent.com/PublicaMundi/MappingAPI/master/data/geojson/us-states.json",
     locations="state",
@@ -48,29 +115,42 @@ choropleth_fig = px.choropleth(
     title="Average Purchase Amount by State"
 )
 
-choropleth_fig.update_geos(fitbounds="locations")
+fig1.update_geos(fitbounds="locations")  
+fig1.update_layout(
+    plot_bgcolor="#D8DBBD",  # Set the plot background color
+    paper_bgcolor="#D8DBBD",  # Set the paper (outer) background color
+    font=dict(color="black")  # Set the font color to black for better contrast
+)
 
-# Query to get sales by product type
+# Query for sales by product type
 curs.execute('''SELECT 
     PRODUCT_TYPE,
     SUM(TOTAL_PRICE) AS total_sales_by_product
 FROM 3_orders
 GROUP BY PRODUCT_TYPE LIMIT 10;
 ''')
+
+# Fetch the results into a list of tuples
 tables = [row for row in curs.fetchall()]
 
 # Convert the results into a DataFrame
 sales_df = pd.DataFrame(tables, columns=["product_type", "total_sales"])
 
 # Create a pie chart using Plotly
-pie_chart_fig = px.pie(sales_df, 
-                       names='product_type', 
-                       values='total_sales', 
-                       title="Sales by Product Type",
-                       color='product_type',  
-                       color_discrete_sequence=px.colors.qualitative.Set3)
+fig2 = px.pie(sales_df, 
+             names='product_type', 
+             values='total_sales', 
+             title="Sales by Product Type",
+             color='product_type',  # Color by product type
+             color_discrete_sequence=px.colors.qualitative.Set3)  # Set color palette
 
-# Query to get page view count by page
+fig2.update_layout(
+    plot_bgcolor="#D8DBBD",  # Set the plot background color
+    paper_bgcolor="#D8DBBD",  # Set the paper (outer) background color
+    font=dict(color="black")  # Set the font color to black for better contrast
+)
+
+# Query for page views
 curs.execute('''SELECT 
     PAGEID,
     COUNT(*) AS view_count
@@ -87,47 +167,45 @@ tables = [row for row in curs.fetchall()]
 pageview_df = pd.DataFrame(tables, columns=["page_id", "view_count"])
 
 # Create a bar chart using Plotly
-bar_chart_fig = px.bar(pageview_df, 
-                       x='page_id', 
-                       y='view_count', 
-                       title="Top Viewed Pages by Users",
-                       labels={'page_id': 'Page ID', 'view_count': 'View Count'},  
-                       color='page_id',  
-                       color_discrete_sequence=px.colors.qualitative.Set3)
+fig3 = px.bar(pageview_df, 
+             x='page_id', 
+             y='view_count', 
+             title="Top Viewed Pages by Users",
+             labels={'page_id': 'Page ID', 'view_count': 'View Count'},  # Axis labels
+             color='page_id',  # Color by page ID
+             color_discrete_sequence=px.colors.qualitative.Set3)  # Set color palette
 
-# Query to get user orders
+fig3.update_layout(
+    plot_bgcolor="#D8DBBD",  # Set the plot background color
+    paper_bgcolor="#D8DBBD",  # Set the paper (outer) background color
+    font=dict(color="black")  # Set the font color to black for better contrast
+)
+
+# Query for user order details
 curs.execute('''SELECT 
     USERID, 
     COUNT(*) AS ORDER_COUNT, 
     SUM(TOTAL_PRICE) AS TOTAL_PRICE,
-    SUM(TOTAL_PRICE) / COUNT(*) AS AVG_PRICE
+    SUM(TOTAL_PRICE) /  COUNT(*) AS AVG_PRICE
 FROM 3_orders
-GROUP BY USERID;''')
+GROUP BY USERID;
+''')
 
-# Fetch the results into a DataFrame
+# Fetch data and create a DataFrame for user orders
 user_orders = pd.DataFrame(curs.fetchall(), columns=["USERID", "ORDER_COUNT", "TOTAL_PRICE", "AVG_PRICE"])
 
-# Generate user ids if not present
+# Add user IDs if they are not present
 user_ids = [f"User_{i+1}" for i in range(len(user_orders))]
 user_orders['USERID'] = user_ids
 
-# Streamlit Layout with 2 columns and 2 rows
-st.title("Data Visualizations")
 
-# First Row: Choropleth and Pie Chart
 col1, col2 = st.columns(2)
 
 with col1:
-    st.plotly_chart(choropleth_fig)
+    st.dataframe(user_orders, use_container_width=True) 
+    st.plotly_chart(fig1, use_container_width=True)  # Plot the choropleth map
 
 with col2:
-    st.plotly_chart(pie_chart_fig)
+    st.plotly_chart(fig3, use_container_width=True)  # Plot the bar chart
+    st.plotly_chart(fig2, use_container_width=True)  # Plot the pie chart
 
-# Second Row: Bar Chart and User Orders Table
-col3, col4 = st.columns(2)
-
-with col3:
-    st.plotly_chart(bar_chart_fig)
-
-with col4:
-    st.dataframe(user_orders)
