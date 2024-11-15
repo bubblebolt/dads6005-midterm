@@ -197,6 +197,7 @@ st.session_state.autorefresh = st.checkbox(
 if st.session_state.autorefresh:
     st_autorefresh(interval=5000)
 
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -238,13 +239,3 @@ with col2:
     st.plotly_chart(fig1, use_container_width=True, height=900)  # Plot the choropleth map
 
 
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.image("https://t4.ftcdn.net/jpg/06/87/55/51/360_F_687555127_cjbaJXPyIpkhsLF0U74kH5mJT1B54wOs.jpg", height=600, width=500)
-with col2:
-    st.image("https://t4.ftcdn.net/jpg/06/87/55/51/360_F_687555127_cjbaJXPyIpkhsLF0U74kH5mJT1B54wOs.jpg", height=600, width=500)
-with col3:
-    st.image("https://d30wkz0ptv5pwh.cloudfront.net/media/magefan_blog/mobile_phone.jpg", height=600, width=500)
-with col4:
-    st.image("https://media.product.which.co.uk/prod/images/ar_2to1_1500x750/22a475e555d7-best-laptop-deals.jpg", height=600, width=500)
