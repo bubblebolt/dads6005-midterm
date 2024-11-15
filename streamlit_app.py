@@ -60,11 +60,6 @@ st.markdown(
         margin: 0;  /* Remove margin */
     }
 
-        /* Custom style for full-width images */
-    .full-width-image {{
-        width: 100%;  /* Make images take up the full container width */
-        height: auto;  /* Keep aspect ratio */
-    }
     </style>
     """, 
     unsafe_allow_html=True
@@ -79,7 +74,6 @@ st.markdown(
     """, 
     unsafe_allow_html=True
 )
-
 
 # Establish the connection
 conn = connect(host='54.179.138.51', port=8099, path='/query/sql', schema='http')
@@ -122,8 +116,7 @@ fig1 = px.choropleth(
     locations="state",
     featureidkey="properties.name",
     color="avg_purchase_amount",
-    color_continuous_scale="Viridis",
-    title="Average Purchase Amount by State"
+    color_continuous_scale="Viridis"
 )
 
 fig1.update_geos(fitbounds="locations")  
@@ -151,7 +144,6 @@ sales_df = pd.DataFrame(tables, columns=["product_type", "total_sales"])
 fig2 = px.pie(sales_df, 
              names='product_type', 
              values='total_sales', 
-             title="Sales by Product Type",
              color='product_type',  # Color by product type
              color_discrete_sequence=px.colors.qualitative.Set1)  # Set color palette
 
@@ -177,21 +169,6 @@ tables = [row for row in curs.fetchall()]
 # Convert the results into a DataFrame
 pageview_df = pd.DataFrame(tables, columns=["page_id", "view_count"])
 
-# Create a bar chart using Plotly
-fig3 = px.bar(pageview_df, 
-             x='page_id', 
-             y='view_count', 
-             title="Top Viewed Pages by Users",
-             labels={'page_id': 'Page ID', 'view_count': 'View Count'},  # Axis labels
-             color='page_id',  # Color by page ID
-             color_discrete_sequence=px.colors.qualitative.Set1)  # Set color palette
-
-fig3.update_layout(
-    plot_bgcolor="#D8DBBD",  # Set the plot background color
-    paper_bgcolor="#D8DBBD",  # Set the paper (outer) background color
-    font=dict(color="black")  # Set the font color to black for better contrast
-)
-
 # Query for user order details
 curs.execute('''SELECT 
     USERID, 
@@ -209,18 +186,6 @@ user_orders = pd.DataFrame(curs.fetchall(), columns=["USERID", "ORDER_COUNT", "T
 user_ids = [f"User_{i+1}" for i in range(len(user_orders))]
 user_orders['USERID'] = user_ids
 
-st.markdown("<br>", unsafe_allow_html=True)
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.image("https://t4.ftcdn.net/jpg/06/87/55/51/360_F_687555127_cjbaJXPyIpkhsLF0U74kH5mJT1B54wOs.jpg", use_column_width=True)
-with col2:
-    st.image("https://i1.adis.ws/i/canon/eos-r7-lifestyle_c604337a3b374a94a080d40b43f3a920?$70-30-header-4by3-dt-jpg$", use_column_width=True)
-with col3:
-    st.image("https://d30wkz0ptv5pwh.cloudfront.net/media/magefan_blog/mobile_phone.jpg", use_column_width=True)
-with col4:
-    st.image("https://media.product.which.co.uk/prod/images/ar_2to1_1500x750/22a475e555d7-best-laptop-deals.jpg", use_column_width=True)
-
 # Display the checkbox with the right position
 st.session_state.autorefresh = st.checkbox(
     "Enable Auto-Refresh (5 seconds)", 
@@ -235,10 +200,40 @@ if st.session_state.autorefresh:
 col1, col2 = st.columns(2)
 
 with col1:
+    st.subheader("User Orders DataFrame")
     st.dataframe(user_orders, use_container_width=True) 
-    st.plotly_chart(fig3, use_container_width=True)  # Plot the bar chart
+    # Display the multi-select widget first
+    st.subheader("Top Viewed Pages by Users")
+    selected_pages = st.multiselect(
+        "Select Pages to Display",
+        options=pageview_df['page_id'].unique(),
+        default=pageview_df['page_id'].unique(),  # Default to all pages selected
+        help="Select one or more pages to view their data."
+    )
 
+    # Filter the DataFrame based on the selected page_ids
+    filtered_df = pageview_df[pageview_df['page_id'].isin(selected_pages)]
+
+    # Create and display the filtered bar chart (fig3_filtered)
+    fig3_filtered = px.bar(filtered_df, 
+                           x='page_id', 
+                           y='view_count', 
+                           labels={'page_id': 'Page ID', 'view_count': 'View Count'}, 
+                           color='page_id', 
+                           color_discrete_sequence=px.colors.qualitative.Set1)
+
+    fig3_filtered.update_layout(
+        plot_bgcolor="#D8DBBD", 
+        paper_bgcolor="#D8DBBD", 
+        font=dict(color="black")
+    )
+
+    # Plot the bar chart
+    st.plotly_chart(fig3_filtered, use_container_width=True)
+ 
 with col2:
-    st.plotly_chart(fig2, use_container_width=True)  # Plot the pie chart
-    st.plotly_chart(fig1, use_container_width=True)  # Plot the choropleth map
+    st.subheader("Sales by Product Type")
+    st.plotly_chart(fig2, use_container_width=True, height=800)  # Plot the pie chart
+    st.subheader("Average Purchase Amount by State")
+    st.plotly_chart(fig1, use_container_width=True, height=900)  # Plot the choropleth map
 
