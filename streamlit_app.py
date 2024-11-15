@@ -188,7 +188,7 @@ user_orders['USERID'] = user_ids
 
 # Display the checkbox with the right position
 st.session_state.autorefresh = st.checkbox(
-    "Enable Auto-Refresh (5 seconds)", 
+    "Enable Auto-Refresh (5 seconds)🔄", 
     value=st.session_state.autorefresh,
     key="auto_refresh", 
     help="Check this to enable auto-refresh every 5 seconds."
@@ -237,3 +237,14 @@ with col2:
     st.subheader("Average Purchase Amount by State")
     st.plotly_chart(fig1, use_container_width=True, height=900)  # Plot the choropleth map
 
+
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.image("https://t4.ftcdn.net/jpg/06/87/55/51/360_F_687555127_cjbaJXPyIpkhsLF0U74kH5mJT1B54wOs.jpg", height=600, width=500)
+with col2:
+    st.image("https://t4.ftcdn.net/jpg/06/87/55/51/360_F_687555127_cjbaJXPyIpkhsLF0U74kH5mJT1B54wOs.jpg", height=600, width=500)
+with col3:
+    st.image("https://d30wkz0ptv5pwh.cloudfront.net/media/magefan_blog/mobile_phone.jpg", height=600, width=500)
+with col4:
+    st.image("https://media.product.which.co.uk/prod/images/ar_2to1_1500x750/22a475e555d7-best-laptop-deals.jpg", height=600, width=500)
