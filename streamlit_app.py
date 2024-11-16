@@ -8,6 +8,7 @@ from PIL import Image
 import requests
 from io import BytesIO
 
+
 # Set Streamlit page configuration for wide layout
 st.set_page_config(layout="wide")
 
@@ -71,7 +72,7 @@ st.markdown(
     """
     <header data-testid="stHeader">
         <img src="https://raw.githubusercontent.com/bubblebolt/dads/main/DADS5001/ASM4-Dash/Pics/BOBO%20SHOP.png" alt="Logo">  <!-- Use the raw file link -->
-        <h1>BoBo Shops Dashboard</h1>
+        <h1>BoBo Shop Dashboard</h1>
     </header>
     """, 
     unsafe_allow_html=True
@@ -80,6 +81,45 @@ st.markdown(
 # Establish the connection
 conn = connect(host='54.179.138.51', port=8099, path='/query/sql', schema='http')
 curs = conn.cursor()
+
+curs.execute('''
+SELECT 
+    PRODUCT_TYPE, 
+    AVG(UNIT_PRICE) AS AVG_UNIT_PRICE
+FROM 
+    3_orders
+GROUP BY 
+    PRODUCT_TYPE; 
+''')
+
+current_data = pd.DataFrame(curs.fetchall(), columns=["PRODUCT_TYPE", "AVG_UNIT_PRICE"])
+
+# Initialize session state for previous data
+if "previous_data" not in st.session_state:
+    st.session_state.previous_data = current_data.copy()
+
+# Calculate delta
+merged_data = pd.merge(
+    current_data, 
+    st.session_state.previous_data, 
+    on="PRODUCT_TYPE", 
+    how="inner", 
+    suffixes=('_current', '_previous')
+)
+merged_data['DELTA'] = merged_data['AVG_UNIT_PRICE_current'] - merged_data['AVG_UNIT_PRICE_previous']
+
+# Display metrics with color-coded deltas
+cols = st.columns(len(merged_data))
+for i, (col, row) in enumerate(zip(cols, merged_data.itertuples())):
+    col.metric(
+        label=f"Product: {row.PRODUCT_TYPE}",
+        value=f"${row.AVG_UNIT_PRICE_current:.2f}",
+        delta=f"{row.DELTA:+.2f}",
+        delta_color="inverse"
+    )
+
+# Update previous data with the current data for the next iteration
+st.session_state.previous_data = current_data.copy()
 
 # Query for average purchase by state
 curs.execute('''SELECT 
@@ -239,6 +279,11 @@ with col2:
     st.plotly_chart(fig2, use_container_width=True, height=800)  # Plot the pie chart
     st.subheader("Average Purchase Amount by State")
     st.plotly_chart(fig1, use_container_width=True, height=900)  # Plot the choropleth map
+
+
+st.header("")
+
+
 
 col1, col2, col3, col4 = st.columns(4)
 
