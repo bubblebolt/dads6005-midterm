@@ -245,6 +245,7 @@ col1, col2 = st.columns(2)
 with col1:
     st.subheader("User Orders DataFrame")
     st.dataframe(user_orders, use_container_width=True) 
+    
     # Display the multi-select widget first
     st.subheader("Top Viewed Pages by Users")
     selected_pages = st.multiselect(
@@ -273,7 +274,7 @@ with col1:
 
     # Plot the bar chart
     st.plotly_chart(fig3_filtered, use_container_width=True)
- 
+    
 with col2:
     st.subheader("Sales by Product Type")
     st.plotly_chart(fig2, use_container_width=True, height=800)  # Plot the pie chart
