@@ -1,0 +1,38 @@
+{
+  "schemaName": "2_users",
+  "dimensionFieldSpecs": [
+    {
+      "name": "userid",
+      "dataType": "STRING",
+      "multiValue": false
+    },
+    {
+      "name": "regionid",
+      "dataType": "STRING",
+      "multiValue": false
+    },
+    {
+      "name": "gender",
+      "dataType": "STRING",
+      "multiValue": false
+    }
+  ],
+  "metricFieldSpecs": [],
+  "timeFieldSpecs": [
+    {
+      "name": "registertime",
+      "dataType": "LONG",
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:MILLISECONDS"
+    }
+  ],
+  "dateTimeFieldSpecs": [
+    {
+      "name": "timestamp",
+      "dataType": "LONG",
+      "notNull": false,
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:MILLISECONDS"
+    }
+  ]
+}

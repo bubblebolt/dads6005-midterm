@@ -1,0 +1,33 @@
+{
+  "schemaName": "1_pageviews",
+  "dimensionFieldSpecs": [
+    {
+      "name": "userid",
+      "dataType": "STRING",
+      "multiValue": false
+    },
+    {
+      "name": "pageid",
+      "dataType": "STRING",
+      "multiValue": false
+    }
+  ],
+  "metricFieldSpecs": [],
+  "timeFieldSpecs": [
+    {
+      "name": "viewtime",
+      "dataType": "LONG",
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:MILLISECONDS"
+    }
+  ],
+  "dateTimeFieldSpecs": [
+    {
+      "name": "timestamp",
+      "dataType": "LONG",
+      "notNull": false,
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:MILLISECONDS"
+    }
+  ]
+}

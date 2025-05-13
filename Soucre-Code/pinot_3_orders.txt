@@ -1,0 +1,57 @@
+{
+  "schemaName": "3_orders",
+  "enableColumnBasedNullHandling": false,
+  "dimensionFieldSpecs": [
+    {
+      "name": "ORDERID",
+      "dataType": "STRING",
+      "notNull": false
+    },
+    {
+      "name": "USERID",
+      "dataType": "STRING",
+      "notNull": false
+    },
+    {
+      "name": "PRODUCT_TYPE",
+      "dataType": "STRING",
+      "notNull": false
+    },
+    {
+      "name": "STATE",
+      "dataType": "STRING",
+      "notNull": false
+    },
+    {
+      "name": "STATUS",
+      "dataType": "STRING",
+      "notNull": false
+    }
+  ],
+  "metricFieldSpecs": [
+    {
+      "name": "UNIT_PRICE",
+      "dataType": "DOUBLE",
+      "notNull": false
+    },
+    {
+      "name": "QUANTITY",
+      "dataType": "INT",
+      "notNull": false
+    },
+    {
+      "name": "TOTAL_PRICE",
+      "dataType": "DOUBLE",
+      "notNull": false
+    }
+  ],
+  "dateTimeFieldSpecs": [
+    {
+      "name": "timestamp",
+      "dataType": "LONG",
+      "notNull": false,
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:MILLISECONDS"
+    }
+  ]
+}

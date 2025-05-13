@@ -1,0 +1,21 @@
+- query 1 -
+SELECT 
+    STATE,
+    AVG(TOTAL_PRICE) AS avg_price_per_state
+FROM 3_orders
+GROUP BY STATE;
+
+- query 2 -
+ SELECT 
+   USERID,
+   PAGEID,
+   COUNT(*) AS PAGEVIEWS_COUNT
+FROM 1_pageviews
+GROUP BY USERID, PAGEID;
+
+- query 3 - 
+    SELECT 
+        PRODUCT_TYPE,
+        SUM(TOTAL_PRICE) AS total_sales
+    FROM 3_orders
+    GROUP BY PRODUCT_TYPE;

@@ -1,0 +1,14 @@
+{
+  "inputs": [
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user123", "PAGE_URL": "/home", "TIMESTAMP": "2024-11-15T10:00:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user456", "PAGE_URL": "/about", "TIMESTAMP": "2024-11-15T10:05:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user123", "PAGE_URL": "/contact", "TIMESTAMP": "2024-11-15T10:10:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user789", "PAGE_URL": "/home", "TIMESTAMP": "2024-11-15T10:20:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user456", "PAGE_URL": "/services", "TIMESTAMP": "2024-11-15T10:25:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user123", "PAGE_URL": "/home", "TIMESTAMP": "2024-11-15T10:30:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user456", "PAGE_URL": "/about", "TIMESTAMP": "2024-11-15T10:35:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user123", "PAGE_URL": "/contact", "TIMESTAMP": "2024-11-15T10:40:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user789", "PAGE_URL": "/about", "TIMESTAMP": "2024-11-15T10:50:00Z"}},
+    {"topic": "datagen-pageviews", "key": null, "value": {"USER_ID": "user123", "PAGE_URL": "/home", "TIMESTAMP": "2024-11-15T11:00:00Z"}}
+  ]
+}

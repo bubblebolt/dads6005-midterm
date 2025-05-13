@@ -1,0 +1,13 @@
+{
+  "name": "datagen-pageviews",
+  "connector.class": "io.confluent.kafka.connect.datagen.DatagenConnector",
+  "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+  "value.converter": "org.apache.kafka.connect.json.JsonConverter",
+  "value.converter.schemas.enable": "false",
+  "kafka.topic": "1_pageviews",
+  "max.interval": "1000",
+  "quickstart": "pageviews",
+  "interval.type": "random", 
+  "interval.range.min": "1", 
+  "interval.range.max": "100" 
+}

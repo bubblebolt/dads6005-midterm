@@ -1,0 +1,124 @@
+- สร้าง 8 Topics - 
+1_pageviews
+2_users
+3_orders
+4_cleaned 
+5_aggregated 
+6_tumbling 
+7_hopping
+8_session 
+
+
+-Topic 1_Pageviews & 2_Users-
+datagen-pageviews.json
+datagen-users.json
+
+
+CREATE STREAM pageviews_stream (
+  viewtime BIGINT,
+  userid VARCHAR,
+  pageid VARCHAR
+) 
+WITH (KAFKA_TOPIC='1_pageviews', VALUE_FORMAT='JSON');
+
+
+CREATE TABLE users_tb (
+  registertime BIGINT,
+  userid VARCHAR PRIMARY KEY,
+  regionid VARCHAR,
+  gender VARCHAR
+) 
+WITH (KAFKA_TOPIC='2_users', VALUE_FORMAT='JSON');
+
+
+-Topic 3_orders-
+
+CREATE STREAM orders_stream (
+    ORDERID STRING,
+    USERID STRING,
+    ORDER_TIMESTAMP STRING,
+    PRODUCT_TYPE STRING,
+    UNIT_PRICE DOUBLE,
+    QUANTITY INT,
+    TOTAL_PRICE DOUBLE,
+    STATE STRING,
+    STATUS STRING
+) WITH (
+    KAFKA_TOPIC='3_orders', 
+    VALUE_FORMAT='JSON'
+);
+
+
+- Topic 4_cleaned -
+
+CREATE TABLE USERS_CLEAN WITH (KAFKA_TOPIC = '4_cleaned', VALUE_FORMAT = 'JSON') AS
+    SELECT 
+        USERID,
+        REGIONID,
+        GENDER,
+        TIMESTAMPTOSTRING(REGISTERTIME / 1000, 'yyyy-MM-dd HH:mm:ss') AS REGISTERTIME_FORMATTED
+    FROM users_tb;
+
+
+CREATE STREAM PAGEVIEWS_CLEAN WITH (KAFKA_TOPIC = '4_cleaned', VALUE_FORMAT = 'JSON') AS
+    SELECT 
+        USERID,
+        PAGEID,
+       	VIEWTIME/6000  AS VIEWTIME_FORMATTED
+    FROM PAGEVIEWS_STREAM;
+
+- Topic 5_agg - 
+
+CREATE TABLE 5_sales_by_product 
+    WITH (KAFKA_TOPIC = '5_aggregated') AS
+SELECT 
+    o.PRODUCT_TYPE,
+    COUNT(o.ORDERID) AS total_orders,
+    SUM(o.TOTAL_PRICE) AS total_sales,
+    SUM(o.TOTAL_PRICE) / COUNT(o.ORDERID) AS avg_sales_per_order
+FROM ORDERS_STREAM o
+LEFT JOIN USERS_CLEAN u
+    ON o.USERID = u.USERID
+GROUP BY o.PRODUCT_TYPE;
+
+
+
+- Topic 6_tumbing -
+
+
+CREATE TABLE 6_pageviews_per_user WITH (KAFKA_TOPIC='6_tumbling') AS
+    SELECT 
+        pv.USERID,
+        COUNT(*) AS PAGEVIEWS_COUNT
+    FROM PAGEVIEWS_CLEAN pv
+    WINDOW TUMBLING (SIZE 1 HOUR)  -- 1-hour window
+    GROUP BY pv.USERID EMIT CHANGES;
+
+
+
+
+- Topic 7_Hopping -
+
+CREATE TABLE 7_total_orders_hopping 
+  WITH (KAFKA_TOPIC='7_hopping') AS
+    SELECT 
+        o.USERID,
+        COUNT(*) AS ORDER_COUNT,
+        SUM(o.TOTAL_PRICE) AS TOTAL_SALES
+    FROM orders_stream o
+    WINDOW HOPPING (SIZE 1 HOUR, ADVANCE BY 30 MINUTES)  -- 1-hour window, hops every 30 minutes
+    GROUP BY o.USERID EMIT CHANGES;
+
+
+- Topic 8_Session - 
+
+CREATE TABLE 8_orders_session_table 
+    WITH (KAFKA_TOPIC='8_session') AS
+    SELECT 
+        USERID, 
+        COUNT(*) AS ORDER_COUNT, 
+        SUM(TOTAL_PRICE) AS TOTAL_ORDER_VALUE
+    FROM orders_stream
+    WINDOW SESSION (10 MINUTES)
+    GROUP BY USERID
+    EMIT CHANGES;
